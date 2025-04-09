@@ -1,40 +1,63 @@
 import React, { useState } from "react";
-import { useUserContext } from "../App";
+import { useDispatch } from "react-redux";
+import { addUser } from "../redux/userSlice";
 
 const AddUserPopup = () => {
-  const { handleAddUser, setShowAddPopup } = useUserContext();
+  const dispatch = useDispatch();
+  const [showPopup, setShowPopup] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [localError, setLocalError] = useState("");
+  const [error, setError] = useState("");
 
   const isValidEmail = (email) => /^\S+@\S+\.\S+$/.test(email);
 
   const handleSubmit = () => {
-    setLocalError(""); 
+    setError("");
     if (!name || !email) {
-      setLocalError("Both fields are required!");
+      setError("Both fields are required!");
       return;
     }
     if (!isValidEmail(email)) {
-      setLocalError("Invalid email format!");
+      setError("Invalid email format!");
       return;
     }
-    handleAddUser({ name, email });
-    setShowAddPopup(false); 
+
+    dispatch(addUser({ name, email }));
+    setShowPopup(false);
+    setName("");
+    setEmail("");
   };
 
   return (
-    <div className="popup">
-      <div className="popup-content">
-        <h2>Add User</h2>
-        {localError && <p className="error">{localError}</p>}
-        <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <br />
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <br />
-        <button className="save-btn" onClick={handleSubmit}>Add</button>
-        <button className="cancel-btn" onClick={() => setShowAddPopup(false)}>Cancel</button>
-      </div>
+    <div>
+      <button className="add-user-btn" onClick={() => setShowPopup(true)}>
+        Add User
+      </button>
+
+      {showPopup && (
+        <div className="popup">
+          <div className="popup-content">
+            <h2>Add User</h2>
+            {error && <p className="error">{error}</p>}
+            <input
+              type="text"
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <br />
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <br />
+            <button onClick={handleSubmit}>Add</button>
+            <button onClick={() => setShowPopup(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

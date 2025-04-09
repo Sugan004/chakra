@@ -1,27 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { useUserContext } from "../App";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { editUser, clearEditingUser } from "../redux/userSlice";
 
 const EditUserPopup = () => {
-  const { editingUser, setEditingUser, handleEditUser } = useUserContext();
-
-  // Initialize state with default values
+  const dispatch = useDispatch();
+  const editingUser = useSelector((state) => state.users.editingUser);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
-  // Update state when editingUser changes
   useEffect(() => {
     if (editingUser) {
-      setName(editingUser.name || "");
-      setEmail(editingUser.email || "");
+      setName(editingUser.name);
+      setEmail(editingUser.email);
     }
   }, [editingUser]);
 
   const isValidEmail = (email) => /^\S+@\S+\.\S+$/.test(email);
 
   const handleSubmit = () => {
-    setError(""); // Reset error before validation
-
+    setError("");
     if (!name || !email) {
       setError("Both fields are required!");
       return;
@@ -31,16 +29,14 @@ const EditUserPopup = () => {
       return;
     }
 
-    handleEditUser({ id: editingUser.id, name, email });
+    dispatch(editUser({ id: editingUser.id, name, email }));
   };
 
   return (
     <div className="popup">
       <div className="popup-content">
         <h2>Edit User</h2>
-
         {error && <p className="error">{error}</p>}
-
         <input
           type="text"
           value={name}
@@ -53,13 +49,8 @@ const EditUserPopup = () => {
           onChange={(e) => setEmail(e.target.value)}
         />
         <br />
-
-        <button className="save-btn" onClick={handleSubmit}>
-          Save
-        </button>
-        <button className="cancel-btn" onClick={() => setEditingUser(null)}>
-          Cancel
-        </button>
+        <button onClick={handleSubmit}>Save</button>
+        <button onClick={() => dispatch(clearEditingUser())}>Cancel</button>
       </div>
     </div>
   );

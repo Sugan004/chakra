@@ -1,8 +1,10 @@
 import React from "react";
-import { useUserContext } from "../App";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteUser, setEditingUser } from "../redux/userSlice";
 
 const UserTable = () => {
-  const { users, setEditingUser, handleDeleteUser } = useUserContext();
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.users.list);
 
   return (
     <table>
@@ -21,8 +23,8 @@ const UserTable = () => {
             <td>{user.name}</td>
             <td>{user.email}</td>
             <td>
-              <button className="edit-btn" onClick={() => setEditingUser(user)}>Edit</button>
-              <button className="delete-btn" onClick={() => handleDeleteUser(user.id)}>Delete</button>
+              <button onClick={() => dispatch(setEditingUser(user))}>Edit</button>
+              <button onClick={() => dispatch(deleteUser(user.id))}>Delete</button>
             </td>
           </tr>
         ))}
